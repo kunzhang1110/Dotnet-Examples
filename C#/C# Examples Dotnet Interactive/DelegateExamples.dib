@@ -1,0 +1,148 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+# Delegate
+
+#!csharp
+
+public delegate void Print(string message); //delegate type declaration
+
+public void PrintMessage(string m) //method matching delegate
+{ Console.WriteLine($"{m}");}
+
+public void UsePrint(Print print) //passing delegate to another method
+{ print("In UsePrint");}
+
+Print printHandler = PrintMessage;   //assign method to delegate instance
+printHandler("invoke delegate"); //invoke delegate instance's method
+UsePrint(printHandler);//passing delegate to another method
+
+//verbose way
+Print printDelegate = new Print(PrintMessage); 
+printDelegate.Invoke("invoke delegate");
+
+#!markdown
+
+## Multicast Delegate
+
+#!csharp
+
+public delegate void Print(string message);  //delegate type declaration
+public void Method1(string m) { Console.Write($"{m} 1 "); }
+public void Method2(string m) { Console.Write($"{m} 2 "); }
+public void Method3(string m) { Console.WriteLine($"{m} 3 "); }
+
+Print p1 = Method1;
+Print p2 = Method2;
+Print p3 = Method3;
+
+Print allHanders = p2 + p1; //in order
+allHanders += p3; 
+allHanders("M");   //M2 M1 M3
+
+#!markdown
+
+## Func Action Prediate
+
+#!csharp
+
+//Func<>
+public string Sum(int x, int y){return (x + y).ToString();} 
+Func<int, int, string> add = Sum;
+
+// Same as
+// delegate string Func(int x, int y);Func add = Sum;
+
+Console.WriteLine(add(10, 10));
+
+// Action<>
+public void ConsolePrint(int i){ Console.WriteLine(i);}
+Action<int> printAction = ConsolePrint;
+
+//Same
+// public delegate void Action(int i); Action printAction  = ConsolePrint;
+
+printAction(10);
+
+//Predicate<>
+public bool IsUpperCase(string str){ return str.Equals(str.ToUpper());}
+ Predicate<string> isUpper = IsUpperCase;
+
+ //Same
+// public delegate bool Predicate(string str); Predicate isUpper  = IsUpperCase;
+
+Console.WriteLine(isUpper("hello world!!"));
+
+#!markdown
+
+## Anonymous Methods
+
+#!csharp
+
+public delegate int Sum(int i);
+int outer = 10;
+
+Sum add = delegate (int val) {
+    val += outer;
+    return val;
+};
+
+Sum addStatementLambda = (int val)=> {
+    val += outer;
+    return val;
+};
+
+Sum addExpressionLambda = (int val)=> val += outer;
+
+Console.WriteLine(add(100));//110
+Console.WriteLine(addStatementLambda(100));//110
+Console.WriteLine(addExpressionLambda(100));//110
+
+#!markdown
+
+Events
+
+#!csharp
+
+using System.Threading;
+
+public class DataEventArgs : EventArgs{ public string Data { get; set; }}
+
+// public delegate void OnCompleteEventHandler(object source, DataEventArgs args);
+// public event OnCompleteEventHandler OnComplete;
+
+class Publisher
+{
+    public event EventHandler<DataEventArgs> OnDownloadComplete;
+    public string name = "Downloader";
+    
+    public void GetVideo(String url)
+    {
+        Console.WriteLine("Downloading Video from: " + url);
+        Thread.Sleep(500); //getting data
+        string data = "LOTR"; 
+        //Download Complete
+        OnDownloadComplete?.Invoke(this, new DataEventArgs() { Data = data });//this = publisher
+    }
+}
+        
+class Subscriber
+{
+    string name = "Video Player";
+ 
+    public void DownloadCompleteThenPlayVideo(object source, DataEventArgs eventArgs)
+    {
+        Console.WriteLine($"{name} is playing {eventArgs.Data} ");
+    }
+}
+         
+var publisher = new Publisher();
+var subscriber = new Subscriber();
+
+publisher.OnDownloadComplete += subscriber.DownloadCompleteThenPlayVideo; //subscribe
+publisher.GetVideo("www.xxx.com");
+
+ 

@@ -1,0 +1,83 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+# Data Types
+
+#!markdown
+
+## Enums
+
+#!csharp
+
+public enum ShippingMethod
+{
+    RegularAirMail= 1,
+    RegisteredAirMail = 2,
+    Express =3
+}
+var m = ShippingMethod.Express;
+Console.WriteLine((int)m); //3
+var mId = 3;
+Console.WriteLine((ShippingMethod)mId); //Express
+Console.WriteLine(m.ToString()); //Express
+// Convert String to Enum
+var mName = "Express";
+var shippingMethod = (ShippingMethod) Enum.Parse(typeof(ShippingMethod), mName);
+Console.WriteLine(shippingMethod); //Express
+
+#!markdown
+
+## Struct
+
+#!csharp
+
+//Declaration
+struct Employee
+{
+    public int EmpId;
+    public string Name;
+
+    static Employee() //static parameterless
+    {
+        Console.Write("First object created");
+    }
+    public Employee(int empid, string name)
+    {
+        EmpId = empid;
+        Name = name;
+    }
+}
+
+//Create with new key word
+Employee emp1 = new Employee();
+Console.WriteLine(emp1.EmpId); // prints 0  
+
+//Create without new key word
+Employee emp2;
+emp2.EmpId = 1;
+Console.WriteLine(emp2.EmpId); // prints 1
+
+#!markdown
+
+## Nullable Value Types
+
+#!csharp
+
+DateTime? date = null; //DateTime is a struct/value
+Console.WriteLine(date ?? DateTime.Today);
+//equivalent to
+Console.WriteLine((date != null) ? date.Value : DateTime.Today);
+
+#!markdown
+
+### Null operators 
+
+#!csharp
+
+DateTime? date = null; //DateTime is a struct/value
+Console.WriteLine((date?.Month)==null);
+date = date??DateTime.Today;
+Console.WriteLine(date?.Month);

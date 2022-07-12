@@ -1,0 +1,127 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+# CLR Memory Management - Stack and heap
+
+#!csharp
+
+public struct Ticker{
+    public string name;
+}
+
+public class Stock{
+    public Ticker field_ticker;
+    
+    public Stock(string tick){field_ticker.name = tick;}
+
+    public string GetLocalTicker(){
+        Ticker local_ticker = new Ticker(){name="ASX" + field_ticker.name};
+        Stock local_stock = new Stock("BHP Australia");
+        return local_ticker.name;
+    }
+}
+
+static void main(){
+
+    Stock bhp = new Stock("BHP");
+    // 1) a object is created on Heap
+    //     a) a stuct pointed by field_ticker is created on Heap
+    //     b) field_ticker is on Heap
+    
+    // Stock bhp = Object Address;
+    //     1) the new object's address is assigned to Stock bhp
+    //      - Stock bhp is on Stack (because it is local variable of main())
+    
+    bhp.GetLocalTicker();
+    // bhp.GetLocalTicker() executes
+    //   - CLR find the object and method table on heap
+    //   - Stack is now used for GetLocalTicker() execution
+    //     a) a stuct pointed by local_ticker is created on stack
+    //     b) local_ticker is on Stack
+    //     c) a new object pointed by local_stock is created on Heap
+    //     d) local_stock is on Stack
+    
+    
+    Ticker bhpTicker = new Ticker(){name="BHP.L"};
+    // a stuct pointed by bhpTicker is created on stack
+    // bhpTicker is on stack
+    
+}
+
+#!markdown
+
+# CLR Internals
+
+#!csharp
+
+public interface MyInterface1
+{
+    void Method1();
+    void Method2();
+}
+
+public interface MyInterface2
+{
+    void Method2();
+}
+
+class MyClass : MyInterface1, MyInterface2
+{
+    public static string str = "MyString";
+    public static uint ui = 0xAAAAAAAA;
+    public void Method1()
+    {
+        Console.WriteLine("Method1");
+    }
+    public virtual void Method2()
+    {
+        Console.WriteLine("Method2");
+    }
+}
+
+class MySubClass : MyClass
+{
+    public override void Method2()
+    {
+        Console.WriteLine("Method2 SubClass");
+    }
+}
+
+class Program
+{
+    static void Main()
+    {
+        MyClass mc = new MyClass();
+        MyClass mcSub = new MySubClass();
+        MySubClass mSub = new MySubClass();
+        MyInterface1 mi1 = mc;
+
+        mc.Method1(); //direct dispatch
+
+        mcSub.Method1(); //direct dispatch
+        mcSub.Method2(); //virtual dispatch
+        mSub.Method2();//direct dispatch
+
+        mc.Method2(); //direct dispatch
+        mi1.Method2(); //interface dispatch
+    }
+}
+
+#!csharp
+
+//;Direct Dispatch
+mov ecx,esi //;move "this" pointer into ecx 
+cmp dword ptr [ecx],ecx //;compare and set flags 
+call dword ptr ds:[009552D8h] //;directly call Method1
+
+#!csharp
+
+//; Virtual Dispatch
+mov ecx,edi //;move "this" pointer into ecx 
+mov eax,dword ptr [ecx] //;move the MethodTable address of this into eax
+mov eax,dword ptr [eax+0Ch] //;move IVMap address at offset 12 into eax
+mov eax,dword ptr [eax+30h] //;move the ifc impl start slot into eax 
+call dword ptr [eax] //;call Method1 mc.Method1(); 

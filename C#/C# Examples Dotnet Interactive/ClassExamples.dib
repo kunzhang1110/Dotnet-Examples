@@ -1,0 +1,159 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Class
+
+#!markdown
+
+## Method Modifiers
+
+#!markdown
+
+### params modifier
+using params, compiler sotres arguments of a method into a array
+
+#!csharp
+
+public static int TotalMarks(string name, params int[] list)
+{
+    int total = 0;
+    for (int i = 0; i < list.Length; i++)
+        total += list[i];
+    return total;
+}
+Console.WriteLine(TotalMarks("Kun", 7, 9, 8)); //24
+
+#!markdown
+
+### ref/out modifier
+ref/out is passed by reference, not value.
+- ref: The passed in argument must be initialized before calling the methods.
+- out: The passed in argument do not need to be initialized (unlike ref) before method but must be initialized in the method.
+
+#!csharp
+
+public class Person{
+    public string Name = ""; 
+}
+
+void Foo()
+{
+    var kun = new Person(){Name = "Kun"};
+    Console.WriteLine($"{kun.Name} - {kun.GetHashCode()}");
+    ByValue(kun); // kun passed by value
+    Console.WriteLine($"{kun.Name} - {kun.GetHashCode()}"); //unaffected
+    ByReference(ref kun); // kun passed by reference
+    Console.WriteLine($"{kun.Name} - {kun.GetHashCode()}"); //kun points to new obj john
+}
+
+void ByValue(Person m)//m is a copy of address that points to kun
+{
+    var john = new Person(){Name = "John"};   
+    m = john;//copy points to John
+}
+
+void ByReference(ref Person m) //m is original address that points to kun
+{
+    var john = new Person(){Name = "John"};   
+    m = john;//oringal points to John
+}
+Foo();
+
+#!markdown
+
+## Indexer
+
+#!csharp
+
+using System.Collections.Generic;
+class StringDataStore
+{
+    private Dictionary<string ,string> _data = new Dictionary<string, string>(); // internal data storage
+ 
+    public string this[string key]
+    {
+        get => _data[key];
+        set =>_data[key] = value + " Letter";  //value
+    }
+}
+
+StringDataStore strStore = new StringDataStore();
+strStore["A"] = "First";
+strStore["B"] = "Second";
+Console.WriteLine($"{strStore["A"]} {strStore["B"]}")
+
+#!markdown
+
+## Protected
+
+#!csharp
+
+class BaseClass
+{
+    protected int x =10;
+    private int y = 20;
+    public virtual void method1(){
+        var baseObj= new BaseClass();
+        var subObj = new SubClass();
+        Console.WriteLine(baseObj.x); //OK 
+        Console.WriteLine(subObj.x); //OK
+    }
+}
+		
+class SubClass : BaseClass
+{
+    public override void method1()
+    {
+        var baseObj= new BaseClass();
+        var subObj = new SubClass();
+        Console.WriteLine(baseObj.x); //Error protected x can only be accessed by classes derived from BaseClass
+        Console.WriteLine(this.x); //OK
+    }
+}
+
+class OtherClass{
+    public void method3(){
+        var baseObj= new BaseClass();
+        var subObj = new SubClass();
+        Console.WriteLine(baseObj.x); //Error 
+        Console.WriteLine(subObj.x); //Error
+    }
+}
+
+#!markdown
+
+## Abstract Class,Interface
+
+#!csharp
+
+abstract class Animal
+{
+  public abstract void animalSound(); 
+  public void sleep(){Console.WriteLine("Zzz");}
+}
+
+class Pig : Animal // Derived class (inherit from Animal)
+{
+  public override void animalSound(){Console.WriteLine("Wee Wee");}
+}
+
+Pig myPig = new Pig(); 
+myPig.animalSound();  // Call the abstract method
+myPig.sleep();  // Call the regular method
+
+#!csharp
+
+interface IAnimal 
+{
+  void animalSound(); // interface method (does not have a body)
+}
+
+class Pig : IAnimal 
+{
+  public void animalSound(){Console.WriteLine("Wee Wee");}
+}
+Pig myPig = new Pig(); // Create a Pig object
+myPig.animalSound();  // Call the interface method

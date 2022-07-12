@@ -1,0 +1,43 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":null,"items":[{"name":"csharp","languageName":"C#","aliases":["c#","cs"]},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"html","languageName":"HTML"},{"name":"sql","languageName":"SQL"},{"name":"kql","languageName":"KQL"},{"name":"mermaid","languageName":"Mermaid"},{"name":"httpRequest","languageName":"http"},{"name":"value"}]}}
+
+#!markdown
+
+# Reflection
+
+#!csharp
+
+using System.Reflection;
+
+class Student
+{
+    public string Name { get; set; }
+
+    public Student(){}
+    public Student(string name){Name =name;}
+
+    protected string PrintName(string text) {return text + Name;}
+
+}
+
+delegate string PrintNameDelegate(string text);
+var alice = new Student { Name = "Alice" };
+
+//Get Type
+Type type = alice.GetType();
+
+//Instantiate object with type
+var constructorParameters = new object[] { "Bob" };
+var bob = (Student)Activator.CreateInstance(type, constructorParameters);
+
+//Invoke Method
+var bindingFlags = BindingFlags.NonPublic | BindingFlags.Instance; //search non-public instance memebers
+MethodInfo printNameMethod = type.GetMethod("PrintName", bindingFlags);//protected method PrintName
+var methodParameters = new object[] { "Name is " };
+var result = printNameMethod.Invoke(bob, methodParameters);
+Console.WriteLine(result);
+
+//Create Delegate
+var del = (PrintNameDelegate)Delegate.CreateDelegate(typeof(PrintNameDelegate), bob, printNameMethod);
+Console.WriteLine(del("My Name is "));

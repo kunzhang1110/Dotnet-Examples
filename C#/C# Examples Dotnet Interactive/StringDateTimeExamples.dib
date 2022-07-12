@@ -1,0 +1,144 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# String
+
+#!markdown
+
+## String Methods
+
+#!markdown
+
+#### string.Join()
+
+#!csharp
+
+var nums = new int[]{1, 2, 3};
+Console.Write(string.Join(',',nums))
+
+#!markdown
+
+#### string.Format()
+
+#!csharp
+
+var nums = new int[]{1, 2, 3};
+Console.Write(string.Format("{0} {1}",nums[0], nums[1]));
+
+#!markdown
+
+#### Verbatim Strings @
+
+#!csharp
+
+string path1 = "c:\\projects\\folder1";
+string path2 = @"c:\projects\folder1"; //verbatim strings
+
+#!markdown
+
+#### Interpolated String $
+
+#!csharp
+
+var fullName = "Kun Zhang";
+Console.WriteLine("ToUpper: " + fullName.ToUpper());
+Console.WriteLine($"ToUpper: {fullName.ToUpper()}");
+
+#!markdown
+
+#### Other Methods
+
+#!csharp
+
+var fullName = "Kun Zhang  ";
+Console.WriteLine($"Trim: {fullName.Trim()}");
+Console.WriteLine($"ToUpper: {fullName.ToUpper()}");
+ 
+//SubString
+var index = fullName.IndexOf(' ');
+var firstName = fullName.Substring(0, index); //(start, length)
+var lastName = fullName.Substring(index+1); //(start) to end
+Console.WriteLine($"First Name: {firstName}");
+ 
+//Split
+var names = fullName.Split(' ');
+Console.WriteLine($"Last Split: {names[1]}");
+ 
+//Replace
+Console.WriteLine($"Replace: {fullName.Replace("Kun", "Ken")}");
+ 
+ 
+var str = "25.52";
+if (!String.IsNullOrEmpty(str))
+{
+    var price = Convert.ToDouble(str);
+    Console.WriteLine($"Convert to formatted strings {price.ToString("C")}");
+}
+
+#!markdown
+
+## StringBuilder
+StringBuilder is faster than string, but does not provide "search" methods.
+
+#!csharp
+
+var builder = new StringBuilder("Hello");
+builder
+.Append('-', 10) //repeats 10 times
+.AppendLine()
+.Append("Header")
+.Replace("Header", "Head")
+.Remove(0, 2) //remove 10 elements from 0
+.Insert(0, new string('-', 10));//insert at index 0
+Console.WriteLine(builder.ToString());
+Console.WriteLine(builder[9]); //return char
+
+#!markdown
+
+## StringWriter/Reader
+StringWriter/Reader writes to/reads from a string synchronously or asynchronously.
+
+#!csharp
+
+using System.IO;
+string text = "Hello. This is Line 1 \n Hello. This is Line 2 \n";
+//Writing string into StringBuilder
+StringBuilder sb = new StringBuilder();
+StringWriter writer = new StringWriter(sb);
+//Store Data on StringBuilder
+writer.WriteLine(text);
+writer.Flush();
+writer.Close();
+
+//Read Entry
+StringReader reader = new StringReader(sb.ToString());
+//Check to End of File
+while (reader.Peek() > -1)
+{
+    Console.WriteLine(reader.ReadLine());
+}
+
+#!markdown
+
+# DateTime
+
+#!csharp
+
+//Create DateTime 
+var old = new DateTime(2019, 1, 1);
+var now = DateTime.Now;
+var today = DateTime.Today;
+ 
+//Properties
+Console.WriteLine($"Now Hour: {now.Hour}");
+ 
+//Add 
+var yesterday = now.AddDays(-1);
+ 
+//To String
+Console.WriteLine(now.ToLongDateString());
+Console.WriteLine(now.ToShortTimeString());
+Console.WriteLine(now.ToString("yyyy-MM-dd hh:mm:ss "));

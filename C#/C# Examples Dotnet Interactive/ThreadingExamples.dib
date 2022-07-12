@@ -1,0 +1,209 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Threading
+
+#!markdown
+
+## .Join()
+
+#!csharp
+
+using System.Threading;
+private static Thread t1, t2;
+
+t1 = new Thread(ThreadProc);
+t1.Name = "Thread1";
+t1.Start();
+
+t2 = new Thread(ThreadProc);
+t2.Name = "Thread2";
+t2.Start();   
+
+t1.Join();//pause calling thread main thread until t1 finishes
+//--main thread finish--
+
+private static void ThreadProc()
+{
+   Console.WriteLine("\nCurrent thread: {0}", Thread.CurrentThread.Name);
+   if (Thread.CurrentThread.Name == "Thread1")
+      t2.Join(); //pause t1 until t2 finishes
+
+   Thread.Sleep(2000);
+   Console.WriteLine("\nCurrent thread: {0}", Thread.CurrentThread.Name);
+   Console.WriteLine("Thread1: {0}", t1.ThreadState);
+   Console.WriteLine("Thread2: {0}\n", t2.ThreadState);
+}
+
+#!markdown
+
+## Passing Data to a Thread
+
+#!csharp
+
+using System.Threading;
+static void Print(string message){Console.WriteLine(message);}
+Thread t = new Thread(() => Print("Hello from t!"));
+t.Start();
+
+#!csharp
+
+using System.Threading;
+static void Print(Object message){
+    Console.WriteLine((string) message);//Object as param need to cast
+} 
+Thread t = new Thread(Print);
+t.Start("Hello from t");
+
+#!markdown
+
+## Foreground and Background Threads
+
+#!csharp
+
+static void Main(string[] args)
+{
+    Thread worker = new Thread(() => Console.ReadLine());
+    if (args.Length > 0) worker.IsBackground = true; //if no arg, thread is background 
+    worker.Start();
+}
+
+#!markdown
+
+## Task Parallel Library
+
+#!csharp
+
+using System.Threading;
+
+public static string GetContent(){
+    Thread.Sleep(1000);
+    return "Content" ;}
+Task<string> task = new Task<string>(() => GetContent());
+task.Start();
+Console.WriteLine(task.Result)
+
+#!markdown
+
+### Specifying a state object
+
+#!csharp
+
+static void Greet(List<int> list) { Console.Write(list[0]); } //1
+
+var task = Task.Factory.StartNew(state => 
+    Greet((List<int>) state),new List<int>(){1, 2});
+Console.WriteLine(task.AsyncState); //System.Collections.Generic.List
+
+#!markdown
+
+## async await
+
+#!csharp
+
+public async Task<int> GetNumber(){
+    await Task.Delay(100);
+    // Return a type of "int", not "Task<int>"
+    return 42;}
+
+public async Task GetDay(){
+    var day = await Task.FromResult(DateTime.Now.DayOfWeek);
+    // Return void, not "Task"
+    Console.WriteLine(day);}
+
+var number = await GetNumber();
+await GetDay();
+Console.WriteLine(number);
+
+
+//without async await
+public Task GetTask(){
+    return new Task(()=>Console.WriteLine("Task"));
+}
+var task = GetTask();
+task.Start();
+task.Wait()
+
+#!markdown
+
+## Locking
+
+#!csharp
+
+class Locker{public int Value { get; set; }}
+
+static Locker _locker = new Locker() { Value = 0 };
+ 
+static void TestLock()
+{
+    lock (_locker)
+    {
+        _locker.Value += 1;
+        Thread.Sleep(50);
+        Console.WriteLine(_locker.Value);
+    }
+}
+for (int i = 0; i <5; i++)
+{
+    ThreadStart start = new ThreadStart(TestLock);
+    new Thread(start).Start();
+}
+Thread.Sleep(1000);
+//Result 1 2 3 4 5
+//Without lock 5 5 5 5 5
+
+#!markdown
+
+### Monitor
+
+#!csharp
+
+static Locker _locker = new Locker() { Value = 0 };
+static void TestMonitor()
+{
+    Monitor.Enter(_locker);
+    try
+    {
+        _locker.Value += 1;
+        Thread.Sleep(50);
+        Console.WriteLine(_locker.Value);
+    }
+    finally
+    {
+        Monitor.Exit(_locker);
+    }
+}
+
+for (int i = 0; i <5; i++)
+{
+    ThreadStart start = new ThreadStart(TestMonitor);
+    new Thread(start).Start();
+}
+Thread.Sleep(1000);
+
+#!markdown
+
+### Deadlock
+
+#!csharp
+
+object locker1 = new object();
+object locker2 = new object();
+ 
+new Thread(() => {
+    lock (locker1)
+    {
+        Thread.Sleep(1000);
+        lock (locker2){};// Deadlock
+    }
+}).Start();
+new Thread(() => {
+    lock (locker2)
+    {
+    Thread.Sleep(1000);
+    lock (locker1){}; // Deadlock
+    }
+}).Start();

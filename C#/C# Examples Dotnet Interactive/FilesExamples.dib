@@ -1,0 +1,99 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Files
+
+#!markdown
+
+## Path, File, Directory
+
+#!csharp
+
+using System.IO;
+//Path
+var path = @".\assets\FilesExample1.txt";
+var extention = Path.GetExtension(path);
+var fname = Path.GetFileName(path);
+var dname = Path.GetDirectoryName(path);
+
+//File 
+File.Copy(path, @".\assets\FilesExample_Copy.txt", true);
+File.Delete(@".\assets\FilesExample_Copy.txt");
+if (File.Exists(path))
+{
+    //
+};
+var content = File.ReadAllText(path);
+Console.WriteLine(content);
+
+// Directory
+var newDir =  @".\assets\newEmptyFolder";
+Directory.CreateDirectory(newDir);
+var files = 
+    Directory.GetFiles(newDir, "*.txt", SearchOption.AllDirectories);//get all subdirectores
+var dir = Directory.GetDirectories(newDir, "*", SearchOption.AllDirectories);
+
+#!markdown
+
+## Read Files
+
+#!csharp
+
+var path = @".\assets\FilesExample1.txt";
+		
+//Read all text as strings
+string text = File.ReadAllText(path);
+
+//Read each line of the file into a string array.
+string[] lines = File.ReadAllLines(path);
+
+//Read the file line by line.  
+FileInfo file = new FileInfo(path); 
+using (FileStream stream = file.Open(FileMode.OpenOrCreate))
+{
+    using (StreamReader reader = new StreamReader(stream))
+    {
+        string line;
+        while ((line = reader.ReadLine()) != null)
+        {
+            Console.WriteLine(line);
+        }
+    }
+}
+
+#!markdown
+
+## Write Files
+
+#!csharp
+
+using System.IO;
+
+var path = @".\assets\FilesExample1.txt";
+ 
+//Write an array of strings to a file.
+string[] lines = { "First line", "Second line", "Third line" };
+File.WriteAllLines(path, lines);
+
+//Write one string to a text file.
+string text = "First line";
+File.WriteAllText(@".\assets\FilesExample2.txt", text);
+
+//Write with StreamWriter
+using (StreamWriter writer = new StreamWriter(path, append: true))
+{
+    writer.Write("Another line from streamwriter");
+}
+
+//Write with FileStream and StreamWriter
+FileInfo file = new FileInfo(path);
+using (FileStream stream = file.Open(FileMode.OpenOrCreate))
+{   
+    using (StreamWriter writer = new StreamWriter(stream))
+    {
+        writer.Write("Another line from streamwriter");
+    }
+}

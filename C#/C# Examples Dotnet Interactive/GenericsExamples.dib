@@ -1,0 +1,57 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":["c#","cs"],"languageName":"C#","name":"csharp"},{"aliases":["f#","fs"],"languageName":"F#","name":"fsharp"},{"aliases":[],"languageName":"HTML","name":"html"},{"aliases":[],"languageName":"http","name":"httpRequest"},{"aliases":["js"],"languageName":"JavaScript","name":"javascript"},{"aliases":[],"languageName":"KQL","name":"kql"},{"aliases":[],"languageName":"Mermaid","name":"mermaid"},{"aliases":["powershell"],"languageName":"PowerShell","name":"pwsh"},{"aliases":[],"languageName":"SQL","name":"sql"},{"aliases":[],"name":"value"}]}}
+
+#!markdown
+
+# Generics
+
+#!csharp
+
+class MyGenericClass<T> where T : class
+{
+    public T GenericMethod<U>(T a, U b) where U : struct
+    {
+ 
+        return a;
+    }
+}
+
+MyGenericClass<string> g = new MyGenericClass<string>();
+g.GenericMethod<int>("5", 10);
+
+#!markdown
+
+## Covariance and Contravariance
+
+#!csharp
+
+// Covariant interface.
+interface ICovariant<out R> { }
+class Sample<R> : ICovariant<R> { }
+
+ICovariant<String> istr = new Sample<String>();
+ICovariant<Object> iobj = new Sample<Object>();
+//covariant: base = derived
+iobj = istr;
+
+// Extending covariant interface.
+interface IExtCovariant<out R> : ICovariant<R> { }
+
+#!csharp
+
+// Contravariant delegate.
+public delegate void DContravariant<in A>(A argument);
+
+public static void ObjMethod(Object o){ }
+public static void StringMethod(String s){}
+
+DContravariant<object> dObj = ObjMethod;
+DContravariant<string> dStr = StringMethod;
+
+//Contravariant dervied = base
+dStr = dObj;
+
+// Invoke the delegate.
+dStr("message");
+// dStr(new Object()); //error
