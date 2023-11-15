@@ -5,11 +5,15 @@ namespace EFCoreExamples.Models
 {
     public partial class EFCoreExamplesContext : DbContext
     {
-        private readonly string _connectionString = "Server=MY-LEGION;Database=EFCoreExamples;Trusted_Connection=True;Encrypt=false";
-
+        private readonly string _connectionString = "";
         public EFCoreExamplesContext()
         {
             //the empty constructor is needed for design time DbContext Creation
+        }
+
+        public EFCoreExamplesContext(string connectionString)
+        {
+            _connectionString = connectionString;
         }
 
         //Tables

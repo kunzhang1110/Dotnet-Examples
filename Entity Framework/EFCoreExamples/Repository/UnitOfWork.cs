@@ -4,9 +4,15 @@ namespace EFCoreExamples.Repository
 {
     public class UnitOfWork : IDisposable
     {
-        private readonly EFCoreExamplesContext _context = new EFCoreExamplesContext();
+
+        private readonly EFCoreExamplesContext _context;
         private GenericRepository<Article>? _articleRepository;
         private GenericRepository<Tag>? _tagRepository;
+
+        public UnitOfWork(EFCoreExamplesContext context)
+        {
+            _context = context;
+        }
 
         public GenericRepository<Article> ArticleRepository
         {

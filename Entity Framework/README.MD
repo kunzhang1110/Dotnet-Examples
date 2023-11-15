@@ -1,4 +1,4 @@
-# Entity Framework Example
+# Entity Framework Examples
 
 ## Install Packages
 
@@ -8,26 +8,15 @@ Install-Package Microsoft.EntityFrameworkCore.SqlServer
 Install-Package Microsoft.EntityFrameworkCore.Design
 ```
 
-## Common
-
-- ArticlesWithTag is a View Entity <-> Articles_With_Tag View in database
-
-## DB First Example
-
-1. Create Database in SQL Server using `data.sql`. This will create a Database named "DbFirstExamples".
-1. Use the following command in Package Manager. Change `$server` to SQL Server's server name.
-   ```powershell
-   $server = "MY-LEGION"
-   $database = "DbFirstExamples"
-   Scaffold-DbContext "Server=$($server);Database=$($database);Trusted_Connection=True;Encrypt=No;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
-   ```
-1. Change connectionString in Program.cs
-
-## Code First Example
+## Code First Examples
 
 ### Initial Migration
 
-Change connection string in `EFCoreExamplesContext.cs`
+Change connection string in Tests and in Program.cs to
+
+```c#
+ private readonly string _connectionString = "Server=MY-LEGION;Database=EFCoreExamples;Trusted_Connection=True;Encrypt=false";
+```
 
 If there is no existing Migration, use
 
@@ -38,3 +27,13 @@ If there is no existing Migration, use
 This create a new migration folder and a migration file.
 
 Then run the project. Data is seeded by `DbInitializer.cs`.
+
+## DB First Examples
+
+1. If `EFCoreExamples` database is not already created, run EFCoreExamples to initialize the database.
+1. Use the following command in Package Manager. Change `$server` to SQL Server's server name.
+   ```powershell
+   $server = "MY-LEGION"
+   $database = "EFCoreExamples"
+   Scaffold-DbContext "Server=$($server);Database=$($database);Trusted_Connection=True;Encrypt=No;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models
+   ```

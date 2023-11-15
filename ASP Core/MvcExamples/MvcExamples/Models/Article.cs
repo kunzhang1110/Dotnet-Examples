@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DbFirstExamples.Models
+namespace MvcExamples.Models
 {
-    public partial class Tag
+    public partial class Article
     {
-        public Tag()
+        public Article()
         {
             ArticleTags = new HashSet<ArticleTag>();
         }
 
         public int Id { get; set; }
-        public string? Name { get; set; }
+        public DateTime? Date { get; set; }
+        public string Title { get; set; } = null!;
+        public int? Viewed { get; set; }
 
         public virtual ICollection<ArticleTag> ArticleTags { get; set; }
     }

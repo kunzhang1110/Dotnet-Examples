@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DbFirstExamples.Models
+﻿namespace ApiExamples.Models
 {
     public partial class Tag
     {

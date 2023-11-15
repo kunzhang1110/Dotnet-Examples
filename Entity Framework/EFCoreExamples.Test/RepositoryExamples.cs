@@ -8,11 +8,12 @@ namespace EFCoreExamples.Test
     {
         private readonly EFCoreExamplesContext _context;
         private readonly ITestOutputHelper _output;
+        private readonly string _connectionString = "Server=MY-LEGION;Database=EFCoreExamples;Trusted_Connection=True;Encrypt=false";
 
         public RepositoryExamples(ITestOutputHelper output)
         {
             _output = output;
-            _context = new EFCoreExamplesContext();
+            _context = new EFCoreExamplesContext(_connectionString);
         }
 
         [Fact]
@@ -51,7 +52,7 @@ namespace EFCoreExamples.Test
         [Fact]
         public void UnitOfWorkExample()
         {
-            var uow = new UnitOfWork();
+            var uow = new UnitOfWork(_context);
             uow.ArticleRepository.Add(new Article()
             {
                 Date = new DateTime(2022, 1, 3),
