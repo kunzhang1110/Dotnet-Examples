@@ -80,23 +80,29 @@ static void Main(string[] args)
 using System.Threading;
 
 public static string GetContent(){
+    Console.WriteLine("GetContent Start");
     Thread.Sleep(1000);
-    return "Content" ;}
-Task<string> task = new Task<string>(() => GetContent());
-task.Start();
-Console.WriteLine(task.Result)
+    Console.WriteLine("GetContent Completed");
+    return "Content" ;
+}
+
+
+var task = Task.Run(()=>GetContent());
+//Task<string> task = new Task<string>(() => GetContent());
+//task.Start();
+Console.WriteLine("Continued");
+Console.WriteLine(task.Result);
 
 #!markdown
 
-### Specifying a state object
+### Continuations
 
 #!csharp
 
-static void Greet(List<int> list) { Console.Write(list[0]); } //1
-
-var task = Task.Factory.StartNew(state => 
-    Greet((List<int>) state),new List<int>(){1, 2});
-Console.WriteLine(task.AsyncState); //System.Collections.Generic.List
+var task= Task.Run(()=>GetContent())
+                .ContinueWith(ant=>{Console.WriteLine(ant.Result);});
+Console.WriteLine("Continued");
+task.Wait();
 
 #!markdown
 
@@ -104,28 +110,13 @@ Console.WriteLine(task.AsyncState); //System.Collections.Generic.List
 
 #!csharp
 
-public async Task<int> GetNumber(){
-    await Task.Delay(100);
-    // Return a type of "int", not "Task<int>"
-    return 42;}
-
-public async Task GetDay(){
-    var day = await Task.FromResult(DateTime.Now.DayOfWeek);
-    // Return void, not "Task"
-    Console.WriteLine(day);}
-
-var number = await GetNumber();
-await GetDay();
-Console.WriteLine(number);
-
-
-//without async await
-public Task GetTask(){
-    return new Task(()=>Console.WriteLine("Task"));
+public async static Task<string> GetContentAsync(){
+ return await Task.Run(()=>GetContent()) ;
 }
-var task = GetTask();
-task.Start();
-task.Wait()
+
+Console.WriteLine("Continued");
+var result = await GetContentAsync();
+Console.WriteLine(result);
 
 #!markdown
 
