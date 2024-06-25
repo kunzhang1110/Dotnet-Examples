@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ApiExamples.Repositories
 {
-    public class ArticlesRepository
+    public class ArticlesRepository: IArticlesRepository
     {
         private readonly ApiExamplesContext _context;
         private readonly ILogger? _logger;
@@ -18,6 +18,11 @@ namespace ApiExamples.Repositories
         public async Task<List<Article>> GetAllArticlesAsync()
         {
             return await _context.Articles.ToListAsync();
+        }
+
+        public async Task<List<Tag>> GetAllTagsAsync()
+        {
+            return await _context.Tags.ToListAsync();
         }
 
 
@@ -38,7 +43,7 @@ namespace ApiExamples.Repositories
             {
                 Date = article.Date,
                 Title = article.Title,
-                Tags = article.ArticleTags.Select(a => a.Tag >.Name).ToList()
+                Tags = article.ArticleTags.Select(a => a.Tag?.Name).ToList()
             };
 
             return articleWithTags;

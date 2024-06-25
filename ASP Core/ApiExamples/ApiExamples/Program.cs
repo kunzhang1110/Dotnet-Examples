@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ApiExamples.Utils;
+using ApiExamples.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,9 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<ApiExamplesContext>(
     opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")!)
 );
+
+builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
+
 
 builder.Services
     .AddIdentityCore<User>(opt =>
@@ -91,9 +95,19 @@ app.MapControllers();
 
 
 var scope = app.Services.CreateScope();
-var context = scope.ServiceProvider.GetRequiredService<ApiExamplesContext>();
-var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-await context.Database.MigrateAsync(); //apply migrations
-await DbInitializer.Initialize(context, userManager);
+using (var context = scope.ServiceProvider.GetRequiredService<ApiExamplesContext>())
+{
+    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+
+    if (!builder.Environment.IsEnvironment("Test"))
+    {
+        await context.Database.MigrateAsync(); //apply migrations
+        await DbInitializer.Initialize(context, userManager);
+    }
+ 
+}
+
 
 app.Run();
+
+public partial class Program { }

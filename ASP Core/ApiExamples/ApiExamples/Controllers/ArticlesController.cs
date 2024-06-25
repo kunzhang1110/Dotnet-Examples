@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ApiExamples.Models;
 using ApiExamples.Repositories;
+using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 
 namespace ApiExamples.Controllers
@@ -9,20 +12,23 @@ namespace ApiExamples.Controllers
     [ApiController]
     public class ArticlesController : ControllerBase
     {
-        private readonly ArticlesRepository _repo;
-        private readonly ILogger _logger;
+        private readonly IArticlesRepository _repo;
+        private readonly ILogger<ArticlesController> _logger;
 
-        public ArticlesController(ArticlesRepository repo, ILogger<ArticlesController> logger)
+
+        public ArticlesController(IArticlesRepository repo, ILogger<ArticlesController> logger)
         {
             _repo = repo;
             _logger = logger;
+          
         }
 
         // GET: api/Articles
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Article>>> GetArticles()
         {
-            return await _repo.GetAllArticlesAsync();
+            var result = await _repo.GetAllArticlesAsync();
+            return Ok(result);
         }
 
         // GET: api/Articles/5
@@ -37,7 +43,7 @@ namespace ApiExamples.Controllers
                 return NotFound();
             }
 
-            return articleWithTag;
+            return Ok(articleWithTag);
         }
 
 
@@ -52,14 +58,16 @@ namespace ApiExamples.Controllers
 
             var result = await _repo.UpdateArticleAsync(article);
             if (result == null) return NotFound();
-            return NoContent();
+            return Ok(result);
         }
 
+        // Post: api/Articles
         [HttpPost]
         public async Task<ActionResult<Article>> PostArticle(Article article)
         {
             var result = await _repo.CreateArticleAsync(article);
-            return CreatedAtAction(nameof(GetArticle), new { id = article.Id }, article);
+            if (result == null) return BadRequest();
+            return CreatedAtAction(nameof(GetArticle), new { id = result.Id }, result);
 
         }
 
@@ -69,7 +77,7 @@ namespace ApiExamples.Controllers
         {
             var result = await _repo.DeleteByIdArticleAsync(id);
             if (result == null) return NotFound();
-            return NoContent();
+            return Ok();
         }
 
 

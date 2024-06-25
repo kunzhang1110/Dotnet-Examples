@@ -24,7 +24,7 @@ namespace ApiExamples.Utils
         public static List<Article> SeedArticles { get => _seedArticles; }
         public static List<Tag> SeedTags { get => _seedTags; }
 
-        private static ArticleTag? CreateArticleTag(string articleName, string tagName, ApiExamplesContext context)
+        public static ArticleTag? CreateArticleTag(string articleName, string tagName, ApiExamplesContext context)
         {
             var articleId = context.Articles.Where(a => a.Title == articleName).First()?.Id;
             var tagId = context.Tags.Where(t => t.Name == tagName).First()?.Id;
@@ -67,14 +67,12 @@ namespace ApiExamples.Utils
 
 
 
-            var tags =
-
             foreach (var article in _seedArticles)
             {
                 context.Articles.Add(article);
             }
 
-            foreach (var tag in tags)
+            foreach (var tag in _seedTags)
             {
                 context.Tags.Add(tag);
             }

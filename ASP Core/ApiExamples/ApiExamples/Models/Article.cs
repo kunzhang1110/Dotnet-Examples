@@ -1,4 +1,6 @@
-﻿namespace ApiExamples.Models
+﻿using System.Text.Json.Serialization;
+
+namespace ApiExamples.Models
 {
     public partial class Article
     {
@@ -12,6 +14,7 @@
         public string Title { get; set; } = null!;
         public int? Viewed { get; set; }
 
+        [JsonIgnore]
         public virtual ICollection<ArticleTag> ArticleTags { get; set; }
     }
 }

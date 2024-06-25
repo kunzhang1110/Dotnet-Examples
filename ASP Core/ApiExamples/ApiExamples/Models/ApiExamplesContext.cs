@@ -43,12 +43,15 @@ namespace ApiExamples.Models
                 entity.HasOne(d => d.Article)
                     .WithMany(p => p.ArticleTags)
                     .HasForeignKey(d => d.ArticleId)
-                    .HasConstraintName("FK__ArticleTa__Artic__5629CD9C");
+                    .HasConstraintName("FK__ArticleTa__Artic__5629CD9C")
+                    .OnDelete(DeleteBehavior.Cascade);
+
 
                 entity.HasOne(d => d.Tag)
                     .WithMany(p => p.ArticleTags)
                     .HasForeignKey(d => d.TagId)
                     .HasConstraintName("FK__ArticleTa__TagID__571DF1D5");
+
             });
 
 
