@@ -5,6 +5,7 @@ using ApiExamples.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using ApiExamples.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ApiExamples.Models;
+using ApiExamples.Repositories;
 
 
 namespace ApiExamples.Controllers
@@ -9,12 +9,12 @@ namespace ApiExamples.Controllers
     [ApiController]
     public class ArticlesController : ControllerBase
     {
-        private readonly ApiExamplesContext _context;
+        private readonly ArticlesRepository _repo;
         private readonly ILogger _logger;
 
-        public ArticlesController(ApiExamplesContext context, ILogger<ArticlesController> logger)
+        public ArticlesController(ArticlesRepository repo, ILogger<ArticlesController> logger)
         {
-            _context = context;
+            _repo = repo;
             _logger = logger;
         }
 
@@ -22,7 +22,7 @@ namespace ApiExamples.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Article>>> GetArticles()
         {
-            return await _context.Articles.ToListAsync();
+            return await _repo.GetAllArticlesAsync();
         }
 
         // GET: api/Articles/5
@@ -30,25 +30,14 @@ namespace ApiExamples.Controllers
         public async Task<ActionResult<ArticleWithTags>> GetArticle(int id)
         {
 
-            var article = await _context.Articles
-                .Where(a => a.Id == id)
-                .Include(a => a.ArticleTags)
-                .ThenInclude(at => at.Tag)
-                .FirstOrDefaultAsync();
+            var articleWithTag = await _repo.GetArticleWithTagByIdAsync(id);
 
-            if (article == null)
+            if (articleWithTag == null)
             {
                 return NotFound();
             }
 
-            var articleWithTags = new ArticleWithTags
-            {
-                Date = article.Date,
-                Title = article.Title,
-                Tags = article.ArticleTags.Select(a => a.Tag.Name).ToList()
-            };
-
-            return articleWithTags;
+            return articleWithTag;
         }
 
 
@@ -61,58 +50,28 @@ namespace ApiExamples.Controllers
                 return BadRequest();
             }
 
-            _context.Entry(article).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ArticleExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            var result = await _repo.UpdateArticleAsync(article);
+            if (result == null) return NotFound();
             return NoContent();
         }
 
         [HttpPost]
         public async Task<ActionResult<Article>> PostArticle(Article article)
         {
-            _context.Articles.Add(article);
-            await _context.SaveChangesAsync();
-
+            var result = await _repo.CreateArticleAsync(article);
             return CreatedAtAction(nameof(GetArticle), new { id = article.Id }, article);
+
         }
 
         // DELETE: api/Articles/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteArticle(int id)
         {
-            if (_context.Articles == null)
-            {
-                return NotFound();
-            }
-            var article = await _context.Articles.FindAsync(id);
-            if (article == null)
-            {
-                return NotFound();
-            }
-
-            _context.Articles.Remove(article);
-            await _context.SaveChangesAsync();
-
+            var result = await _repo.DeleteByIdArticleAsync(id);
+            if (result == null) return NotFound();
             return NoContent();
         }
 
-        private bool ArticleExists(int id)
-        {
-            return (_context.Articles?.Any(e => e.Id == id)).GetValueOrDefault();
-        }
+
     }
 }
