@@ -93,19 +93,19 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-
-var scope = app.Services.CreateScope();
-using (var context = scope.ServiceProvider.GetRequiredService<ApiExamplesContext>())
+if (!builder.Environment.IsEnvironment("Test"))
 {
-    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
-
-    if (!builder.Environment.IsEnvironment("Test"))
+    var scope = app.Services.CreateScope();
+    using (var context = scope.ServiceProvider.GetRequiredService<ApiExamplesContext>())
     {
-        await context.Database.MigrateAsync(); //apply migrations
-        await DbInitializer.Initialize(context, userManager);
+        {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            await context.Database.MigrateAsync(); //apply migrations
+            await DbInitializer.Initialize(context, userManager);
+        }
     }
- 
 }
+
 
 
 app.Run();

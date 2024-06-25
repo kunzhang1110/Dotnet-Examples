@@ -12,11 +12,11 @@ using System.Data.Common;
 
 namespace ApiExamples.IntegrationTests
 {
-    public class CustomWebApplicationFactory : WebApplicationFactory<Program>
+    public class ApiExamplesWebApplicationFactory : WebApplicationFactory<Program>
     {
         public Mock<IArticlesRepository> StubArticleRepo { get; }
 
-        public CustomWebApplicationFactory()
+        public ApiExamplesWebApplicationFactory()
         {
             StubArticleRepo = new Mock<IArticlesRepository>();
         }

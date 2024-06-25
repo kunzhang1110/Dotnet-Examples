@@ -41,6 +41,7 @@ namespace ApiExamples.Repositories
 
             var articleWithTags = new ArticleWithTags
             {
+                Id= article.Id,
                 Date = article.Date,
                 Title = article.Title,
                 Tags = article.ArticleTags.Select(a => a.Tag?.Name).ToList()
@@ -60,6 +61,7 @@ namespace ApiExamples.Repositories
 
                 articlesWithTags.Add(new ArticleWithTags
                 {
+                    Id = a.Id,
                     Date = a.Date,
                     Title = a.Title,
                     Tags = a.ArticleTags.Select(at => at.Tag?.Name).ToList()

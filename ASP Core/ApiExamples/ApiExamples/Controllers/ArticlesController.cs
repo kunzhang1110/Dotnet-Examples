@@ -4,6 +4,7 @@ using ApiExamples.Repositories;
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace ApiExamples.Controllers
@@ -14,7 +15,6 @@ namespace ApiExamples.Controllers
     {
         private readonly IArticlesRepository _repo;
         private readonly ILogger<ArticlesController> _logger;
-
 
         public ArticlesController(IArticlesRepository repo, ILogger<ArticlesController> logger)
         {
@@ -46,6 +46,15 @@ namespace ApiExamples.Controllers
             return Ok(articleWithTag);
         }
 
+        // Post: api/Articles
+        [HttpPost]
+        public async Task<ActionResult<Article>> PostArticle(Article article)
+        {
+            var result = await _repo.CreateArticleAsync(article);
+            if (result == null) return BadRequest();
+            return CreatedAtAction(nameof(GetArticle), new { id = result.Id }, result);
+
+        }
 
         [HttpPut("{id}")]
         // PUT: api/Articles/1003
@@ -61,25 +70,15 @@ namespace ApiExamples.Controllers
             return Ok(result);
         }
 
-        // Post: api/Articles
-        [HttpPost]
-        public async Task<ActionResult<Article>> PostArticle(Article article)
-        {
-            var result = await _repo.CreateArticleAsync(article);
-            if (result == null) return BadRequest();
-            return CreatedAtAction(nameof(GetArticle), new { id = result.Id }, result);
-
-        }
-
         // DELETE: api/Articles/5
         [HttpDelete("{id}")]
+        //[Authorize(Roles ="Admin")]
         public async Task<IActionResult> DeleteArticle(int id)
         {
             var result = await _repo.DeleteByIdArticleAsync(id);
             if (result == null) return NotFound();
             return Ok();
         }
-
 
     }
 }

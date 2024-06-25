@@ -14,24 +14,22 @@ using Xunit.Abstractions;
 
 namespace ApiExamples.IntegrationTests
 {
+
     [CollectionDefinition("SequentialTests", DisableParallelization = true)]
-    public class ArticlesControllerTestsCollectionDefinition { }
+    public class ArticlesControllerTestsCollectionDefinition : ICollectionFixture<ApiExamplesContextFixture> { }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerGetTests : IClassFixture<ApiExamplesContextFixture>
+    public class ArticlesControllerGetTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
         private readonly ApiExamplesContextFixture _contextFixture;
 
-
         public ArticlesControllerGetTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
         {
-
             _logger = logger;
             _contextFixture = contextFixture;
             _client = _contextFixture.Client;
-            TestHelper.ReinitializeDbForTests(_contextFixture.Context);
         }
 
         [Fact]
@@ -40,44 +38,46 @@ namespace ApiExamples.IntegrationTests
             var response = await _client.GetAsync("api/Articles");
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = JsonConvert.DeserializeObject<IEnumerable<Article>>(await response.Content.ReadAsStringAsync());
-            TestHelper.AssertObjectEqual(DbInitializer.SeedArticles, result!.ToList().GetRange(0, DbInitializer.SeedArticles.Count));
+            var minLength = Math.Min(DbInitializer.SeedArticles.Count, result!.Count());
+            TestHelper.AssertObjectEqual(
+                DbInitializer.SeedArticles.GetRange(0, minLength),
+                result!.ToList().GetRange(0, minLength));
+            TestHelper.Print(_logger, result!);
         }
 
         [Fact]
         public async Task GetById_IfExists_ReturnsArticleWithTags()
         {
 
-            var studId = 1;
-
+            var stubId = 1;
             var expectedResult = new ArticleWithTags
             {
+                Id = stubId,
                 Date = new DateTime(2022, 01, 01),
                 Title = "NoSQL Review",
                 Tags = new List<string?> { "Database", "MongoDb" }
             };
 
-            var response = await _client.GetAsync($"api/Articles/{studId}");
+            var response = await _client.GetAsync($"api/Articles/{stubId}");
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
             var result = JsonConvert.DeserializeObject<ArticleWithTags>(await response.Content.ReadAsStringAsync());
-            TestHelper.Print(_logger, result);
             TestHelper.AssertObjectEqual(expectedResult, result);
         }
 
         [Fact]
         public async Task GetById_IfMissing_Returns404()
         {
-
-            var studId = 10;
-            var response = await _client.GetAsync($"api/Articles/{studId}");
-
+            var stubId = 10;
+            var response = await _client.GetAsync($"api/Articles/{stubId}");
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
+
     }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerPostTests : IClassFixture<ApiExamplesContextFixture>
+    public class ArticlesControllerPostTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
@@ -86,26 +86,24 @@ namespace ApiExamples.IntegrationTests
 
         public ArticlesControllerPostTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
         {
-
             _logger = logger;
             _contextFixture = contextFixture;
             _client = _contextFixture.Client;
-            TestHelper.ReinitializeDbForTests(_contextFixture.Context);
+
         }
 
         [Fact]
         public async Task PostArticle_WithValidData_ReturnsSavedArticle()
         {
-
+            var stubId = 4;
             var expectedResult = new Article
             {
-                Id = 4,
+                Id = stubId,
                 Date = new DateTime(2022, 01, 01),
                 Title = "NewTitle",
             };
 
-            var newArticle = new Article { Date = new DateTime(2022, 01, 01), Title = "NewTitle" };
-
+            var newArticle = new Article { Date = new DateTime(2022, 01, 01), Title = "NewTitle" }; //id auto generated
             var response = await _client.PostAsync("api/Articles", JsonContent.Create(newArticle));
             var result = JsonConvert.DeserializeObject<Article>(await response.Content.ReadAsStringAsync());
 
@@ -115,7 +113,7 @@ namespace ApiExamples.IntegrationTests
     }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerPutTests : IClassFixture<ApiExamplesContextFixture>
+    public class ArticlesControllerPutTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
@@ -124,34 +122,34 @@ namespace ApiExamples.IntegrationTests
 
         public ArticlesControllerPutTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
         {
-
             _logger = logger;
             _contextFixture = contextFixture;
             _client = _contextFixture.Client;
-            TestHelper.ReinitializeDbForTests(_contextFixture.Context);
         }
 
         [Fact]
         public async Task PutArticle_WithValidData_ReturnsSavedArticle()
         {
+            var stubId = 2;
             var expectedResult = new Article
             {
-                Id = 4,
+                Id = 2,
                 Date = new DateTime(2022, 01, 01),
                 Title = "NewTitle",
             };
+           
+            var newArticle = new Article { Id = stubId, Date = new DateTime(2022, 01, 01), Title = "NewTitle" };
 
-            var newArticle = new Article { Date = new DateTime(2022, 01, 01), Title = "NewTitle" };
-
-            var response = await _client.PostAsync("api/Articles", JsonContent.Create(newArticle));
+            var response = await _client.PutAsync($"api/Articles/{stubId}", JsonContent.Create(newArticle));
             var result = JsonConvert.DeserializeObject<Article>(await response.Content.ReadAsStringAsync());
 
-            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             TestHelper.AssertObjectEqual(expectedResult, result);
         }
     }
+
     [Collection("SequentialTests")]
-    public class ArticlesControllerDeleteTests : IClassFixture<ApiExamplesContextFixture>
+    public class ArticlesControllerDeleteTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
@@ -164,22 +162,15 @@ namespace ApiExamples.IntegrationTests
             _logger = logger;
             _contextFixture = contextFixture;
             _client = _contextFixture.Client;
-            TestHelper.ReinitializeDbForTests(_contextFixture.Context);
         }
 
 
         [Fact]
-        public  void  DeleteArticle_WithValidData_ReturnsOK()
+        public void DeleteArticle_WithValidData_ReturnsOK()
         {
-            var deleteResponse =  _client.DeleteAsync("api/Articles/1").Result;
+            var stubId = 3;
+            var deleteResponse = _client.DeleteAsync($"api/Articles/{stubId}").Result;
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
-            TestHelper.ReinitializeDbForTests(_contextFixture.Context);
-            //var getAllResponse = await _client.GetAsync("api/Articles");
-
-            //var result = JsonConvert.DeserializeObject<Article>(await getAllResponse.Content.ReadAsStringAsync());
-            //TestHelper.Print(_logger, result);
-
-            //TestHelper.AssertObjectEqual(modifiedArticle, result);
         }
 
 

@@ -3,12 +3,11 @@
 This repo contains example code snippets for:
 
 - ASP.NET Core
-  - Api
+  - API: also contains unit tests and integration tests examples.
   - MVC
 - C#
 - Entity Framework Core
-- Testing
-  - XUnit
+
 
 ## Getting Started
 
