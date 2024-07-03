@@ -1,6 +1,4 @@
-﻿using ApiExamples.Models;
-using ApiExamples.Utils;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Xunit.Abstractions;
@@ -29,5 +27,6 @@ namespace ApiExamples.IntegrationTests
         {
             Assert.Equal(ObjectToString(expected), ObjectToString(actual));
         }
+
     }
 }

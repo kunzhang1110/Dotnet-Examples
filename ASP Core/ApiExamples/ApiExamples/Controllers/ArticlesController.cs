@@ -1,11 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ApiExamples.Models;
 using ApiExamples.Repositories;
-using System.Text.Json;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.AspNetCore.Authorization;
-
+using System.Security.Claims;
 
 namespace ApiExamples.Controllers
 {
@@ -20,13 +17,23 @@ namespace ApiExamples.Controllers
         {
             _repo = repo;
             _logger = logger;
-          
+
         }
 
         // GET: api/Articles
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Article>>> GetArticles()
         {
+            var result = await _repo.GetAllArticlesAsync();
+            return Ok(result);
+        }
+
+
+        [Authorize(Roles = "admin")]
+        [HttpGet("admin")]
+        public async Task<ActionResult<IEnumerable<Article>>> GetAdminArticles()
+        {
+            var userId = HttpContext.User?.Claims?.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
             var result = await _repo.GetAllArticlesAsync();
             return Ok(result);
         }

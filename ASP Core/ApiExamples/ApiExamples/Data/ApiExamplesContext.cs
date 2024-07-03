@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using ApiExamples.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace ApiExamples.Models
+namespace ApiExamples.Data
 {
     public partial class ApiExamplesContext : IdentityDbContext<User, Role, int>
     {

@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using ApiExamples.Utils;
 using ApiExamples.Repositories;
+using ApiExamples.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,32 +22,30 @@ builder.Services.AddDbContext<ApiExamplesContext>(
 
 builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
 
-
 builder.Services
-    .AddIdentityCore<User>(opt =>
-    {
-        opt.User.RequireUniqueEmail = true;
+.AddIdentityCore<User>(opt =>
+{
+    opt.User.RequireUniqueEmail = true;
 
-    })
-    .AddRoles<Role>()
-    .AddEntityFrameworkStores<ApiExamplesContext>();
+})
+.AddRoles<Role>()
+.AddEntityFrameworkStores<ApiExamplesContext>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(opt =>
-    {
-        opt.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = false,
-            ValidateAudience = false,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:TokenKey"]))
+  .AddJwtBearer(opt =>
+  {
+      opt.TokenValidationParameters = new TokenValidationParameters
+      {
+          ValidateIssuer = false,
+          ValidateAudience = false,
+          ValidateLifetime = true,
+          ValidateIssuerSigningKey = true,
+          IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JWTSettings:TokenKey"]))
 
-        };
-    });
+      };
+  });
 
 builder.Services.AddAuthorization();
-
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -68,12 +67,13 @@ builder.Services.AddSwaggerGen(c =>
     c.AddSecurityDefinition(jwtSecurityScheme.Reference.Id, jwtSecurityScheme);
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
+{
         {
             jwtSecurityScheme, Array.Empty<string>()
         }
-    });
 });
+});
+
 
 var app = builder.Build();
 
@@ -89,6 +89,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
@@ -106,8 +107,6 @@ if (!builder.Environment.IsEnvironment("Test"))
     }
 }
 
-
-
 app.Run();
 
-public partial class Program { }
+public partial class Program { } //needed for WebApplicationFactory<Program>

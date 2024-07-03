@@ -5,6 +5,7 @@ using Moq;
 using ApiExamples.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 
 
 namespace ApiExamples.UnitTests
@@ -20,8 +21,7 @@ namespace ApiExamples.UnitTests
             _stubLogger = new Mock<ILogger<ArticlesController>>();
             _output = output;
         }
-
-
+        
         [Fact]
         public async void GetById_IfExists_ReturnsArticleWithTags()
         {
@@ -65,7 +65,7 @@ namespace ApiExamples.UnitTests
 
 
         [Fact]
-        public async  void Post_WithValidData_SavesArticle()
+        public async void Post_WithValidData_SavesArticle()
         {
             var stubArticle = new Article
             {
@@ -83,7 +83,7 @@ namespace ApiExamples.UnitTests
             var controller = new ArticlesController(stubRepository.Object, _stubLogger.Object);
 
             var result = await controller.PostArticle(stubArticle);
-            
+
             var createdAtActionResult = Assert.IsType<CreatedAtActionResult>(result.Result);
             var returnValue = Assert.IsType<Article>(createdAtActionResult.Value);
             TestHelper.AssertObjectEqual(stubArticle, returnValue);

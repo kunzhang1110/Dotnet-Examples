@@ -6,6 +6,8 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using ApiExamples.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiExamples.Controllers
 {
@@ -95,16 +97,16 @@ namespace ApiExamples.Controllers
 
         }
 
-
-        [HttpPost("getSession")]
-        public async Task<ActionResult> GetSession([FromForm] string userInput)
+ 
+        [HttpPost("startSession")]
+        public async Task<ActionResult> StartSession([FromForm] string userInput)
         {
             var sessionId = Guid.NewGuid().ToString(); //random id
 
             var cookieOptions = new CookieOptions
             {
-                Secure = true,
-                IsEssential = true,
+                //Secure = true,
+                IsEssential = true,//if false subquent requests in test will not get cookies
                 Expires = DateTime.Now.AddDays(30),
                 SameSite = SameSiteMode.None
             };
@@ -118,14 +120,18 @@ namespace ApiExamples.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpGet("useSession")]
         public async Task<ActionResult> UseSession()
         {
             var sessionId = Request.Cookies["sessionId"];
             var color = Request.Cookies["color"];
             var session = await _context.Sessions.FindAsync(sessionId);
-
-            return Ok(session?.Detail + " " + color);
+            if (session == null)
+            {
+                return Ok("Session not found");
+            }
+            return Ok(session.Detail + " " + color);
         }
 
     }

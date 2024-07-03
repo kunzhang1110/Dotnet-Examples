@@ -1,41 +1,52 @@
-using ApiExamples.Controllers;
+using ApiExamples.DTOs;
 using ApiExamples.Models;
 using ApiExamples.Utils;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.DependencyInjection;
-
 
 using Newtonsoft.Json;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Xunit.Abstractions;
 
 namespace ApiExamples.IntegrationTests
 {
-
     [CollectionDefinition("SequentialTests", DisableParallelization = true)]
-    public class ArticlesControllerTestsCollectionDefinition : ICollectionFixture<ApiExamplesContextFixture> { }
+    public class ArticlesTestsCollectionDefinition : ICollectionFixture<ArticlesFixture> { }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerGetTests
+    public class ArticlesGetTests
     {
-        private HttpClient _client;
         private readonly ITestOutputHelper _logger;
-        private readonly ApiExamplesContextFixture _contextFixture;
+        private readonly ArticlesFixture _fixture;
+        private readonly HttpClient _client;
 
-        public ArticlesControllerGetTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
+        public ArticlesGetTests(ITestOutputHelper logger, ArticlesFixture fixture)
         {
             _logger = logger;
-            _contextFixture = contextFixture;
-            _client = _contextFixture.Client;
+            _fixture = fixture;
+            _client = _fixture.Client;
         }
 
         [Fact]
         public async Task GetArticles_Always_ReturnsAllArticles()
         {
             var response = await _client.GetAsync("api/Articles");
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var result = JsonConvert.DeserializeObject<IEnumerable<Article>>(await response.Content.ReadAsStringAsync());
+            var minLength = Math.Min(DbInitializer.SeedArticles.Count, result!.Count());
+            TestHelper.AssertObjectEqual(
+                DbInitializer.SeedArticles.GetRange(0, minLength),
+                result!.ToList().GetRange(0, minLength));
+            TestHelper.Print(_logger, result!);
+        }
+
+        [Fact]
+        public async Task GetAdminArticles_Always_ReturnsAllArticles()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Get, "api/Articles/admin");
+            request.Headers.Authorization = new AuthenticationHeaderValue(PassThroughAuthHandler.AuthenticationScheme);
+            request.Headers.Add("UserId", "123");
+            var response = await _client.SendAsync(request);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
             var result = JsonConvert.DeserializeObject<IEnumerable<Article>>(await response.Content.ReadAsStringAsync());
             var minLength = Math.Min(DbInitializer.SeedArticles.Count, result!.Count());
@@ -77,18 +88,18 @@ namespace ApiExamples.IntegrationTests
     }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerPostTests
+    public class ArticlesPostTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
-        private readonly ApiExamplesContextFixture _contextFixture;
+        private readonly ArticlesFixture _fixture;
 
 
-        public ArticlesControllerPostTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
+        public ArticlesPostTests(ITestOutputHelper logger, ArticlesFixture fixture)
         {
             _logger = logger;
-            _contextFixture = contextFixture;
-            _client = _contextFixture.Client;
+            _fixture = fixture;
+            _client = _fixture.Client;
 
         }
 
@@ -113,18 +124,18 @@ namespace ApiExamples.IntegrationTests
     }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerPutTests
+    public class ArticlesPutTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
-        private readonly ApiExamplesContextFixture _contextFixture;
+        private readonly ArticlesFixture _fixture;
 
 
-        public ArticlesControllerPutTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
+        public ArticlesPutTests(ITestOutputHelper logger, ArticlesFixture fixture)
         {
             _logger = logger;
-            _contextFixture = contextFixture;
-            _client = _contextFixture.Client;
+            _fixture = fixture;
+            _client = _fixture.Client;
         }
 
         [Fact]
@@ -137,7 +148,7 @@ namespace ApiExamples.IntegrationTests
                 Date = new DateTime(2022, 01, 01),
                 Title = "NewTitle",
             };
-           
+
             var newArticle = new Article { Id = stubId, Date = new DateTime(2022, 01, 01), Title = "NewTitle" };
 
             var response = await _client.PutAsync($"api/Articles/{stubId}", JsonContent.Create(newArticle));
@@ -149,19 +160,18 @@ namespace ApiExamples.IntegrationTests
     }
 
     [Collection("SequentialTests")]
-    public class ArticlesControllerDeleteTests
+    public class ArticlesDeleteTests
     {
         private HttpClient _client;
         private readonly ITestOutputHelper _logger;
-        private readonly ApiExamplesContextFixture _contextFixture;
+        private readonly ArticlesFixture _fixture;
 
 
-        public ArticlesControllerDeleteTests(ITestOutputHelper logger, ApiExamplesContextFixture contextFixture)
+        public ArticlesDeleteTests(ITestOutputHelper logger, ArticlesFixture fixture)
         {
-
             _logger = logger;
-            _contextFixture = contextFixture;
-            _client = _contextFixture.Client;
+            _fixture = fixture;
+            _client = _fixture.Client;
         }
 
 
@@ -172,8 +182,6 @@ namespace ApiExamples.IntegrationTests
             var deleteResponse = _client.DeleteAsync($"api/Articles/{stubId}").Result;
             Assert.Equal(HttpStatusCode.OK, deleteResponse.StatusCode);
         }
-
-
     }
 }
 

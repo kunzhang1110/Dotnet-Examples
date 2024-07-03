@@ -1,4 +1,5 @@
 ﻿using ApiExamples.Controllers;
+using ApiExamples.Data;
 using ApiExamples.Models;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,4 +1,5 @@
-﻿using ApiExamples.Models;
+﻿using ApiExamples.Data;
+using ApiExamples.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
