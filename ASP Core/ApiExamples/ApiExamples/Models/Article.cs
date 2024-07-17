@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using ApiExamples.Shared;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ApiExamples.Models
 {
@@ -10,7 +12,10 @@ namespace ApiExamples.Models
         }
 
         public int Id { get; set; }
+
+        [CustomDateValidation("2000-01-01", EndDate = "2025-01-01", ErrorMessage = "Date is not in range")]
         public DateTime? Date { get; set; }
+
         public string Title { get; set; } = null!;
         public int? Viewed { get; set; }
 

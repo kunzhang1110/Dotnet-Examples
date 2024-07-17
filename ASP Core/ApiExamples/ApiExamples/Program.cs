@@ -87,6 +87,7 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+app.UseMiddleware<CustomMiddleware>();
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
