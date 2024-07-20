@@ -1,0 +1,48 @@
+﻿@{
+    ViewData["Title"] = "WebSocket Example";
+}
+
+<h1>WebSocket Example</h1>
+<button onclick="connect()">Connect</button>
+<button onclick="sendMessage()">Send Message</button>
+<div id="messages"></div>
+
+<script>
+    let socket;
+
+    function connect() {
+        socket = new WebSocket('@Url.Action("Connect", "Socket", null, Context.Request.Scheme)');
+
+        socket.onopen = function (event) {
+            console.log('Connection established');
+            document.getElementById('messages').innerHTML += '<p>Connection established</p>';
+        };
+
+        socket.onmessage = function (event) {
+            console.log('Message from server: ', event.data);
+            document.getElementById('messages').innerHTML += '<p>Message from server: ' + event.data + '</p>';
+        };
+
+        socket.onclose = function (event) {
+            console.log('Connection closed: ', event);
+            document.getElementById('messages').innerHTML += '<p>Connection closed</p>';
+        };
+
+        socket.onerror = function (error) {
+            console.error('WebSocket Error: ', error);
+            document.getElementById('messages').innerHTML += '<p>WebSocket Error: ' + error + '</p>';
+        };
+    }
+
+    function sendMessage() {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            const message = 'Hello, Server!';
+            socket.send(message);
+            console.log('Message sent to server: ', message);
+            document.getElementById('messages').innerHTML += '<p>Message sent to server: ' + message + '</p>';
+        } else {
+            console.error('WebSocket is not open');
+            document.getElementById('messages').innerHTML += '<p>WebSocket is not open</p>';
+        }
+    }
+</script>

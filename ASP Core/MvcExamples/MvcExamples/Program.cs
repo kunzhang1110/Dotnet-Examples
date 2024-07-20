@@ -23,11 +23,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseWebSockets();
 
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Articles}/{action=Index}/{id?}");
+    pattern: "{controller=Articles}/{action=Index}/{id?}"
+);
 
 app.Run();

@@ -21,7 +21,6 @@ namespace MvcExamples.Models
 
         public virtual DbSet<Article> Articles { get; set; } = null!;
         public virtual DbSet<ArticleTag> ArticleTags { get; set; } = null!;
-        public virtual DbSet<Metum> Meta { get; set; } = null!;
         public virtual DbSet<Tag> Tags { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -65,16 +64,7 @@ namespace MvcExamples.Models
                     .HasForeignKey(d => d.TagId)
                     .HasConstraintName("FK__ArticleTa__TagID__571DF1D5");
             });
-
-            modelBuilder.Entity<Metum>(entity =>
-            {
-                entity.Property(e => e.Id).HasColumnName("_id");
-
-                entity.Property(e => e.Name).HasMaxLength(50);
-
-                entity.Property(e => e.Text).HasMaxLength(50);
-            });
-
+            
             modelBuilder.Entity<Tag>(entity =>
             {
                 entity.Property(e => e.Id).HasColumnName("_id");

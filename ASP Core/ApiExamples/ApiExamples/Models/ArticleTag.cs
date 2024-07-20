@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace ApiExamples.Models
+﻿namespace ApiExamples.Models
 {
     public partial class ArticleTag
     {
