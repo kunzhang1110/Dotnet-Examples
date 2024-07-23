@@ -46,16 +46,9 @@ private static void ThreadProc()
 
 using System.Threading;
 static void Print(string message){Console.WriteLine(message);}
-Thread t = new Thread(() => Print("Hello from t!"));
+Thread t = new Thread(() => Print("Hello from t"));
 t.Start();
-
-#!csharp
-
-using System.Threading;
-static void Print(Object message){
-    Console.WriteLine((string) message);//Object as param need to cast
-} 
-Thread t = new Thread(Print);
+t = new Thread(Print);
 t.Start("Hello from t");
 
 #!markdown
@@ -73,7 +66,7 @@ static void Main(string[] args)
 
 #!markdown
 
-## Task Parallel Library
+# Task Parallel Library
 
 #!csharp
 
@@ -95,7 +88,7 @@ Console.WriteLine(task.Result);
 
 #!markdown
 
-### Continuations
+## Continuations
 
 #!csharp
 
@@ -120,7 +113,7 @@ Console.WriteLine(result);
 
 #!markdown
 
-## Locking
+# Locking
 
 #!csharp
 
@@ -128,19 +121,19 @@ class Locker{public int Value { get; set; }}
 
 static Locker _locker = new Locker() { Value = 0 };
  
-static void TestLock()
+static void AddOne()
 {
     lock (_locker)
     {
         _locker.Value += 1;
-        Thread.Sleep(50);
+        Thread.Sleep(100);
         Console.WriteLine(_locker.Value);
     }
 }
 for (int i = 0; i <5; i++)
 {
-    ThreadStart start = new ThreadStart(TestLock);
-    new Thread(start).Start();
+    var t = new Thread(AddOne);
+    t.Start();
 }
 Thread.Sleep(1000);
 //Result 1 2 3 4 5

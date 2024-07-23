@@ -12,7 +12,6 @@ class MyGenericClass<T> where T : class
 {
     public T GenericMethod<U>(T a, U b) where U : struct
     {
- 
         return a;
     }
 }

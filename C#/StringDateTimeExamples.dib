@@ -49,7 +49,7 @@ Console.WriteLine($"ToUpper: {fullName.ToUpper()}");
 
 #!markdown
 
-#### Other Methods
+#### String Methods
 
 #!csharp
 

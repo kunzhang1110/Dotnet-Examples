@@ -47,6 +47,9 @@ void Foo()
     Console.WriteLine($"{kun.Name} - {kun.GetHashCode()}"); //unaffected
     ByReference(ref kun); // kun passed by reference
     Console.WriteLine($"{kun.Name} - {kun.GetHashCode()}"); //kun points to new obj john
+    int x;
+    Console.WriteLine(ByOut(out x));//ByOut
+    Console.WriteLine(x); // 1
 }
 
 void ByValue(Person m)//m is a copy of address that points to kun
@@ -59,6 +62,12 @@ void ByReference(ref Person m) //m is original address that points to kun
 {
     var john = new Person(){Name = "John"};   
     m = john;//oringal points to John
+}
+
+string ByOut(out int x) //x is x in Foo
+{
+    x = 1;
+    return "ByOut";
 }
 Foo();
 
@@ -109,8 +118,9 @@ class SubClass : BaseClass
     {
         var baseObj= new BaseClass();
         var subObj = new SubClass();
-        Console.WriteLine(baseObj.x); //Error protected x can only be accessed by classes derived from BaseClass
-        Console.WriteLine(this.x); //OK
+        Console.WriteLine(baseObj.x); //Invalid: Cannot access protected member through base class reference
+        Console.WriteLine(this.x); //OK accessing through the derived class instance
+        Console.WriteLine(subObj.x); //OK accessing through the derived class instance
     }
 }
 
