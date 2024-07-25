@@ -14,7 +14,6 @@ namespace mvc_example.Controllers
             return View();
         }
 
-
         public async Task<IActionResult> Connect()
         {
             var buffer = new byte[1024 * 4];
@@ -45,6 +44,5 @@ namespace mvc_example.Controllers
 
             return Content("WebSocket Connected");
         }
-
     }
 }

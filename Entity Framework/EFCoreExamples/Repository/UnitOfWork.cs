@@ -14,46 +14,18 @@ namespace EFCoreExamples.Repository
             _context = context;
         }
 
-        public GenericRepository<Article> ArticleRepository
-        {
-            get
-            {
-                _articleRepository ??= new GenericRepository<Article>(_context);
-                return _articleRepository;
-            }
-        }
+        public GenericRepository<Article> ArticleRepository => _articleRepository ??= new GenericRepository<Article>(_context);
 
-        public GenericRepository<Tag> TagRepository
-        {
-            get
-            {
-                _tagRepository ??= new GenericRepository<Tag>(_context);
-                return _tagRepository;
-            }
-        }
+        public GenericRepository<Tag> TagRepository => _tagRepository ??= new GenericRepository<Tag>(_context);
 
         public void Save()
         {
             _context.SaveChanges();
         }
 
-        private bool disposed = false; // To detect redundant calls 
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    _context.Dispose();
-                }
-            }
-            disposed = true;
-        }
-
-        //standard implementation
+        
         public void Dispose()
         {
-            Dispose(true);
             GC.SuppressFinalize(this);
         }
     }

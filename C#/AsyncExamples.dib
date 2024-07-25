@@ -146,13 +146,13 @@ Thread.Sleep(1000);
 #!csharp
 
 static Locker _locker = new Locker() { Value = 0 };
-static void TestMonitor()
+static void AddOne()
 {
     Monitor.Enter(_locker);
     try
     {
         _locker.Value += 1;
-        Thread.Sleep(50);
+        Thread.Sleep(100);
         Console.WriteLine(_locker.Value);
     }
     finally
@@ -163,8 +163,8 @@ static void TestMonitor()
 
 for (int i = 0; i <5; i++)
 {
-    ThreadStart start = new ThreadStart(TestMonitor);
-    new Thread(start).Start();
+    var t = new Thread(AddOne);
+    t.Start();
 }
 Thread.Sleep(1000);
 

@@ -4,13 +4,13 @@ using System.Text.Json;
 
 namespace EFCoreExamples.Test
 {
-    public class RepositoryExamples
+    public class RepositoryExamplesTests
     {
         private readonly EFCoreExamplesContext _context;
         private readonly ITestOutputHelper _output;
         private readonly string _connectionString = "Server=MY-LEGION;Database=EFCoreExamples;Trusted_Connection=True;Encrypt=false";
 
-        public RepositoryExamples(ITestOutputHelper output)
+        public RepositoryExamplesTests(ITestOutputHelper output)
         {
             _output = output;
             _context = new EFCoreExamplesContext(_connectionString);

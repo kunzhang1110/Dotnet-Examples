@@ -3,6 +3,7 @@ using ApiExamples.Models;
 using ApiExamples.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
+using ApiExamples.Shared;
 
 namespace ApiExamples.Controllers
 {
@@ -22,6 +23,7 @@ namespace ApiExamples.Controllers
 
         // GET: api/Articles
         [HttpGet]
+        [ResponseCache(Duration = 30, Location = ResponseCacheLocation.Any, NoStore = false)]
         public async Task<ActionResult<IEnumerable<Article>>> GetArticles()
         {
             var result = await _repo.GetAllArticlesAsync();
@@ -37,6 +39,21 @@ namespace ApiExamples.Controllers
             var result = await _repo.GetAllArticlesAsync();
             return Ok(result);
         }
+
+        [CustomActionFilter("Foo")]// This CustomActionFilter is CustomActionFilterAttribute
+        [HttpGet("actionFilterAttributeResult/{id?}")]
+        public IActionResult GetCustomActionFilterAttributeResult(int id)
+        {
+            return new ObjectResult(new { data = $"id is {id}" });
+        }
+
+        [ServiceFilter(typeof(CustomActionFilter))]
+        [HttpGet("actionFilterResult/{id?}")]
+        public IActionResult GetActionFilterResult(int id)
+        {
+            return new ObjectResult(new { data = $"id is {id}" });
+        }
+
 
         // GET: api/Articles/5
         [HttpGet("{id}")]

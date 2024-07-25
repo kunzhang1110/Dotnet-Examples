@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcExamples.Models;
 
@@ -23,7 +18,7 @@ namespace MvcExamples.Controllers
         {
             var articles = _context.Articles.Select(a=>a);
 
-            if (!String.IsNullOrEmpty(searchString))
+            if (!string.IsNullOrEmpty(searchString))
             {
                 articles = articles.Where(a => a.Title!.Contains(searchString));
             }
@@ -61,13 +56,13 @@ namespace MvcExamples.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Date,Title,Viewed")] Article article)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                _context.Add(article);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Create));
+                return RedirectToAction("Error", "Shared");
             }
-            return View(article);
+            _context.Add(article);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Create));
         }
 
         // GET: Articles/Edit/5

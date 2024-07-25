@@ -27,18 +27,18 @@ namespace EFCoreExamples
 
             var articles = new List<Article>
             {
-                new Article {  Date=new DateTime(2022,1,1), Title="NoSQL Review",Viewed=2},
-                new Article {  Date=new DateTime(2022,1,2), Title="Python Review",Viewed=5},
-                new Article {  Date=new DateTime(2022,1,2), Title="Financial Analysis",Viewed=10},
+                new() {  Date=new DateTime(2022,1,1), Title="NoSQL Review",Viewed=2},
+                new() {  Date=new DateTime(2022,1,2), Title="Python Review",Viewed=5},
+                new() {  Date=new DateTime(2022,1,2), Title="Financial Analysis",Viewed=10},
             };
 
 
             var tags = new List<Tag>
             {
-                new Tag {  Name="Database"},
-                new Tag {  Name="MongoDb"},
-                new Tag {  Name="Python"},
-                new Tag {  Name="Finance"}
+                new () {  Name="Database"},
+                new () {  Name="MongoDb"},
+                new () {  Name="Python"},
+                new () {  Name="Finance"}
             };
 
             foreach (var article in articles)
@@ -68,11 +68,7 @@ namespace EFCoreExamples
                 if (at != null) context.ArticleTags.Add(at);
 
             }
-
             context.SaveChanges();
-
-
-
         }
     }
 }

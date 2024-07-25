@@ -8,6 +8,7 @@ using System.Text;
 using ApiExamples.Utils;
 using ApiExamples.Repositories;
 using ApiExamples.Data;
+using ApiExamples.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddDbContext<ApiExamplesContext>(
 );
 
 builder.Services.AddScoped<IArticlesRepository, ArticlesRepository>();
+builder.Services.AddScoped<CustomActionFilter>();
 
 builder.Services
 .AddIdentityCore<User>(opt =>
@@ -89,7 +91,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<CustomMiddleware>();
 app.UseHttpsRedirection();
-
+app.UseResponseCaching(); // Use response caching middleware
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -11,12 +11,12 @@
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Execute when recieving response 
+        // Execute when receiving a request 
         var request = context.Request;
         var response = context.Response;
         _logger.LogInformation($"Request Method: {request.Method}, Path: {request.Path}");
 
-        // Add a custom response header, this needs to be done when recieving response
+        // Add a custom response header, this needs to be done during receiving the request
         context.Response.Headers.Add("X-Custom-Header", "Hello from custom middleware!");
 
         // Call the next middleware in the pipeline
